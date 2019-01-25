@@ -1,0 +1,76 @@
+
+
+//variables
+$border-radius: 8px;
+
+
+$colors:(
+   primary:#449DD1,
+   primary-gradient: linear-gradient(to bottom right,#88caf0 , #1b93e9),
+   primary-light: lighten(#0050FF, 40%),
+   primary-dark: darken(#0050FF, 40%),
+   accent:#1D2951,
+   accent-light: #1d2951a9,
+   light-text:#CECECE,
+   bk:#F4F7F8,
+);
+
+@function color ($color-name){
+   @return map-get($colors, $color-name);
+}
+
+
+$tiny:320px;
+@mixin tiny {
+   @media (max-width: #{$tiny}){
+      @content;
+   }
+}
+
+$tablet:768px;
+@mixin tablet {
+   @media (min-width: #{$tablet}){
+      @content;
+   }
+}
+
+
+$desktop: 1024px;
+   @mixin desktop {
+      @media(min-width: #{$desktop}){
+         @content;
+      }
+   }
+
+
+
+
+
+.underline-from-left {
+   -webkit-transform: translateZ(0);
+   transform: translateZ(0);
+   -webkit-backface-visibility: hidden;
+   backface-visibility: hidden;
+   -moz-osx-font-smoothing: grayscale;
+   position: relative;
+   overflow: hidden;
+   &:before {
+     content: "";
+     position: absolute;
+     z-index: -1;
+     left: 0;
+     right: 100%;
+     bottom: 0;
+     background: color(accent);
+     height: 5px;
+     -webkit-transition-property: right;
+     transition-property: right;
+     -webkit-transition-duration: 0.3s;
+     transition-duration: 0.3s;
+     -webkit-transition-timing-function: ease-out;
+     transition-timing-function: ease-out;
+   }
+   &:hover:before {
+     right: 0;
+   }
+ }
