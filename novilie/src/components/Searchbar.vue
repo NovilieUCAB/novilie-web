@@ -31,24 +31,24 @@
    div#searchbar{
       background: white;
       color: color(light-text);
-      display: flex;;
+      display: flex;
       align-items: center;
-      padding: 0px 23px;
-      height: 33px;
+      padding: 5px 24px;
+      
       border-radius: 21px;
-      width: 85%;
+      
 
       i{
          margin-right: 8px;
+         font-size: 5.8vw;
       }
 
       input{
          width: 100%;
-         height: 95%;
          margin: 0;
          padding: 0;
          border:none;
-         font-size: 14px;
+         font-size: 4.8vw;
       }
       input:focus{
          border:none;
@@ -56,7 +56,25 @@
       }
 
       input::placeholder{
+          font-size: 4.8vw;
          color:color(light-text);
+      }
+   }
+
+    @include tablet{
+      div#searchbar{
+         i{font-size: 5vw;}
+         input{font-size: 4vw;}
+         input::placeholder{font-size: 4vw;}
+      }
+   }
+
+   @include desktop{
+      div#searchbar{
+         
+         i{font-size: 3.3vw;}
+         input{font-size: 2.2vw;}
+         input::placeholder{font-size: 2.2vw;}
       }
    }
 </style>

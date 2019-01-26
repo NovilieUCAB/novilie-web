@@ -6,63 +6,66 @@
          <i class="material-icons my-float">arrow_back</i>
       </a>
 
+       <a  
+         @click="$emit('goAsesores',true)"
+          id="arrow-text"
+      > <i class="material-icons">arrow_back</i> Volver</a>
+
       <main>
          <div id="asesor-img-container">
-            <div id="img"></div>
+            <div id="img">
+               <img :src="asesor.imgUrl" alt="">
+
+            </div>
          </div>
         <section>
            <div id="name">
-               <h1>Natalia Rodriguez</h1>
+               <h1>{{asesor.nombre}} {{asesor.apellido}}</h1>
                <span>Asesor Inmobiliario</span>
            </div>
            <div id="contacto">
               <h1>Contacto</h1>
                <div>
                   <i class="material-icons">email</i>
-                  <h3>latishab@gmail.com</h3>
+                  <h3>{{asesor.email}}</h3>
                </div>
                <div>
-                  <i class="material-icons">stay_primary_portrait</i>
-                  <h3>+584249304261</h3>
+                  <i class="material-icons">smartphone</i>
+                  <h3>{{asesor.tlf}}</h3>
                </div>
                <div>
                   <i class="material-icons">phone</i>
-                  <h3>02869228201</h3>
+                  <h3>{{asesor.tlfOficina}}</h3>
                </div>
            </div>
            <div id="details">
                <h1>Detalles del Asesor</h1>
                <ul>
-                  <li>Captaciones realizadas: <strong>6</strong></li>
-                  <li>Captaciones en progreso: <strong>6</strong></li>
-                  <li>Clientes atendidos: <strong>6</strong></li>
-                  <li>Tiempo trabajando: <strong>1 año y 4 meses</strong></li>
+                  <li>Captaciones realizadas: <strong>{{asesor.numCaptaciones}}</strong></li>
+                  <li>Captaciones en progreso: <strong>{{asesor.capEnProgreso}}</strong></li>
+                  <li>Clientes atendidos: <strong>{{asesor.clientesAtendidos}}</strong></li>
                </ul>
 
 
            </div>
            <div id="evaluation">
-              <h1>Evaluacion</h1>
+              <h1>Evaluación</h1>
               <div id="rating">
                <star-rating 
                   :increment="0.01"
                   :max-rating="5"
-                  :star-size="30"
+                  :star-size="starSize"
                   :read-only="true"
-                  :rating="rating"
+                  :rating="asesor.evaluacion"
                   :inline="true"
                />
-              
               </div>
            </div>
            <div id="info">
               <h1>Informacion personal</h1>
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt eos mollitia tempore nemo distinctio, accusantium pariatur quis quas excepturi, voluptate aspernatur repellendus quasi eligendi similique temporibus ea necessitatibus perspiciatis quos?</p>
+              <p>{{asesor.infoPersonal}}</p>
            </div>
-
-
         </section>
-
       </main>
 
      
@@ -74,15 +77,25 @@
    export default {
       name:'asesor-info',
       props:{
-         inmueble:Object
+         asesor:Object
       },
       components:{
         StarRating
       },
       data() {
          return {
-            rating: 4.3
+            rating: 1.3,
          }
+      },
+      computed:{
+         starSize(){
+           if (window.innerWidth < 1024){
+               return ((window.innerWidth * 80) / 1920) * 2;
+           }
+               return (window.innerWidth * 80) / 1920;
+         }
+      },
+      methods:{
       }
    }
 </script>
@@ -93,6 +106,11 @@
    #asesor-info{
       padding: 36px;
       color: color(accent);
+
+      a#arrow-text{
+        display: none;
+      }
+
       main{
          background: white;
          box-shadow: 0px 4px 6px rgba(0,0,0,.15); 
@@ -109,9 +127,16 @@
                width: 150px;
                height: 150px;
                border-radius: 50%;
-               background: pink;
+               background:white;
                margin: 0 auto;
                margin-bottom: 12px;
+               img{
+                  background:white;
+                  width: 100%;
+                  height: 100%;
+                  border-radius: 50%;
+                  border:none;
+               }
             }
          }
 
@@ -134,11 +159,11 @@
                div{
                   display: flex;
                   align-items: center;
-                  margin: 8px 16px;
+                  margin: 8px 0;
                   h3{
-                     margin-left: 16px; font-size: 18px;
+                     margin-left: 8px; font-size: 16px;
                      @include tiny{
-                        font-size: 16px;
+                        font-size: 12px;
                      }
                   }
                }
@@ -169,27 +194,114 @@
             }
          }
       }
+      .float{
+         cursor: pointer;
+         position:fixed;
+         width:50px;
+         height:50px;
+         bottom:5px;
+         right:5px;
+         background-color: color(accent);
+         color:#FFF;
+         border-radius:50px;
+         text-align:center;
+         box-shadow: 0px 4px 6px rgba(0,0,0,.15); 
+      }
 
+      .my-float{
+         font-size: 32px;
+         margin-top: 10px;
+      }
    }
 
-   .float{
-      cursor: pointer;
-      position:fixed;
-      width:50px;
-      height:50px;
-      bottom:5px;
-      right:5px;
-      background-color: color(accent);
-      color:#FFF;
-      border-radius:50px;
-      text-align:center;
-      box-shadow: 0px 4px 6px rgba(0,0,0,.15); 
+   @include desktop{
+
+      #asesor-info{
+
+         .custom-rating{
+            color: red !important;
+            font-size: 18vw;
+         }
+         a#arrow-text{
+           box-shadow: 0px 4px 6px rgba(0,0,0,.15); 
+           cursor: pointer;
+           display: flex;
+           align-items: center;
+           background: color(primary-gradient);
+           color:white;
+           padding: 6px 24px;
+           font-size: 2vw;
+           font-weight: bold;
+           margin-bottom: 20px;
+           border-radius: 50px;
+           width: 15%;
+           i{
+              font-size: 36px;
+              margin-right: 8px;
+           }  
+         }
+         main{
+            margin: 0 32px;
+            
+            
+
+            div#asesor-img-container{
+              div#img{
+                  width: 300px;
+               height: 300px;
+              }
+
+            }
+
+            section{
+
+               display: grid;
+               grid-template-columns: 50% 1fr 1fr;
+               grid-template-rows: auto auto auto;
+               grid-template-areas: 
+                  "name details details"
+                  "contacto details details"
+                  "evaluation info info"
+               ;
+               grid-gap: 1em; 
+               padding: 20px 60px;
+
+               h1{font-size: 2vw;}
+               div#name{
+                  grid-area:name;
+                  border-bottom: none;
+                  span{font-size: 1.3vw;}
+               }
+               div#contacto{
+                  grid-area:contacto;
+                  border-bottom: none;
+                  
+                  div{
+                     h3{font-size: 1.5vw;}
+                  }
+               }
+               div#details{
+                  grid-area:details;
+                  border-bottom: none;
+                  ul{
+                     li{font-size: 1.6vw;}
+                  }
+               }
+               div#evaluation{
+                  grid-area:evaluation;
+                  border-bottom: none;
+               }
+               div#info{ 
+                  grid-area:info;
+                  p{font-size: 1.2vw;}   
+               }
+            }
+         }
+         .float{display:none;}
+      }
    }
 
-   .my-float{
-      font-size: 32px;
-      margin-top: 10px;
-   }
+   
 
       
 

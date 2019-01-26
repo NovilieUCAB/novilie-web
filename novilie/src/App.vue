@@ -26,7 +26,7 @@ export default {
       font-family: 'Roboto', sans-serif;
       background: color(bk);
       margin:0;
-      max-width: 1600px;
+      max-width: 1920px;
    }
   
 </style>

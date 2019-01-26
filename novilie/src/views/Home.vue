@@ -1,6 +1,6 @@
 <template>
-   <div class="home">
-      <nav class="navbar">
+   <div id="home">
+      <nav id="navbar">
          <Navbar
             v-on:getOnNavigation="
                onPropiedades = $event.onPropiedades;
@@ -12,22 +12,39 @@
       </nav>        
       <main >
 
+         <search-bar 
+            id="searchbar"
+            v-show="!inmuebleInfo && !asesorInfo"
+         />
+
          <div id="flex-container" v-if="onPropiedades">
-            <div id="inmueble-container" :key="inmueble" v-for="inmueble in inmuebles" 
-               @click="inmuebleInfo = true; onPropiedades=false"
+            <div id="inmueble-container" :key="inmueble.id" v-for="inmueble in inmuebles" 
+               @click="
+                       dataInmuebleSelected = inmueble
+                       getAsesor()
+                     "
             >
                <Inmueble
+                  :inmueble="inmueble"
                />
             </div>
          </div>
          <div id="flex-container" v-else-if="onAsesores">
              <div id="asesor-container" :key="asesor.id" v-for="asesor in asesores"
-               @click="asesorInfo = true; onAsesores=false"
+               @click="
+                       dataAsesorSelected = asesor
+                       asesorInfo = true;
+                       onAsesores=false;
+                       
+                     "
              >
-               <Asesor/>
+               <Asesor
+                  :asesor="asesor"
+               />
             </div>
          </div>
          <inmueble-info 
+            
             v-if="inmuebleInfo" 
             v-on:goPropiedades="
                onPropiedades = $event; 
@@ -35,8 +52,11 @@
                inmuebleInfo = false;
                asesorInfo = false;
             "
+            :inmueble="dataInmuebleSelected"
+            :asesor="asesorInmueble"
          />
          <asesor-info 
+            
             v-if="asesorInfo" 
             v-on:goAsesores="
                onAsesores = $event;
@@ -44,7 +64,7 @@
                inmuebleInfo = false;
                asesorInfo = false;
             "
-
+            :asesor="dataAsesorSelected"
          />
       </main>
    </div>
@@ -57,28 +77,90 @@
    import Asesor from '@/components/Asesor.vue'
    import InmuebleInfo from '@/components/InmuebleInfo.vue'
    import AsesorInfo from '@/components/AsesorInfo.vue'
+   import SearchBar from '@/components/Searchbar.vue'
+
+
+   import firebase from 'firebase'
+import func from './vue-temp/vue-editor-bridge';
 
    export default {
-
       name: 'home',
       components: {
-         Navbar,Inmueble,Asesor,InmuebleInfo,AsesorInfo
+         Navbar,Inmueble,Asesor,InmuebleInfo,AsesorInfo,SearchBar
       },
       data(){
          return {
             
-            inmuebles:[1,2,3,4,5,6,7,8,9,10,11,12,13,14],
-            asesores:[1,2,3,4,5,6,7,8],
+            inmuebles:[],
+            asesores:[],
 
             onPropiedades:true,
             onAsesores:false,
 
             inmuebleInfo:false,
-            asesorInfo:false
+            asesorInfo:false,
+
+            dataInmuebleSelected:null,
+            dataAsesorSelected:null,
+
+            asesorInmueble:Object
              
          }
       },
+      created(){
+         this.readInmuebles()
+         this.readAsesores()
+      },
       methods:{
+        getAsesor(){
+            this.asesores.forEach((a)=>{
+               if (a.cedula == this.dataInmuebleSelected.cedulaAsesor){
+                  this.asesorInmueble = a
+                  this.inmuebleInfo = true;
+                  this.onPropiedades=false;
+               }
+            })
+            this.inmuebleInfo = true;
+            this.onPropiedades=false;
+            return new Object()
+         },
+         readInmuebles(){
+            const db = firebase.firestore()
+            db.collection("Inmuebles").get()
+            .then((querySnapshot) => {
+               const inmuebles = []
+               querySnapshot.forEach((doc) => {
+                  if(doc.data().descripcion){
+                     inmuebles.push(doc.data())
+                  }
+               })
+               this.inmuebles = inmuebles 
+            })
+
+
+
+         },
+          readAsesores(){
+            const db = firebase.firestore()
+
+            db.collection("Asesores Inmobiliarios").get()
+            .then((querySnapshot) => {
+               const asesores = []
+               querySnapshot.forEach((doc) => {
+                     asesores.push(doc.data())
+               })
+               this.asesores = asesores 
+               const storageRef = firebase.storage().ref()
+               this.asesores.forEach((a)=>{
+                  const file = 'asesores/'.concat(a.cedula + '.png')
+                  storageRef.child(file).getDownloadURL()
+                  .then((url)=>{
+                     a.imgUrl = url
+                  }).catch(()=>{
+                  })
+               })
+            })
+         },
       }
    }
 </script>
@@ -88,72 +170,65 @@
 
    @import '@/scss/main.scss';
 
-   div.home{
+   div#home{
       
+      nav{      
+         padding: 19px 36px 0px 36px;
+         background: color(primary-gradient);
+         box-shadow: 0px 4px 6px rgba(0,0,0,.15); 
+      }
+
+      #searchbar{
+         display: none;
+      }
+
+      main{ 
+         div#flex-container{
+            padding: 36px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        
+            #inmueble-container{
+               background: white;
+               margin-bottom:45px;
+               box-shadow: 0px 3px 6px rgba(0,0,0,.15); 
+               border-radius: $border-radius;
+               margin: 18px 18px;
+            }   
+      
+            #asesor-container{
+               background: white;
+               margin-bottom:45px;
+               box-shadow: 0px 3px 6px rgba(0,0,0,.15); 
+               border-radius: $border-radius;
+               margin: 18px 18px;
+            }
+         }
+      }
 
       @include desktop{
+          
          display: grid;
          grid-template-columns: 25% auto;
          grid-template-areas: "nav main";
-      }
-   }
-
-
-   nav{      
-      padding: 19px 36px 0px 36px;
-      background: color(primary-gradient);
-      box-shadow: 0px 4px 6px rgba(0,0,0,.15); 
-
-      @include desktop{
-         grid-area: nav;
          
-      }
-   }
+         nav{      
+            grid-area: nav; 
+         }
 
-   main{ 
-      
-
-      div#flex-container{
-         padding: 36px;
-         display: flex;
-         flex-wrap: wrap;
-         justify-content: center;
-   
-         @include desktop{
+         #searchbar{
+            display: flex;
+            margin: 36px;
+            margin-bottom: 0px;
+         }
+         div#flex-container{
             grid-area: main;
+            
          }
-         
-         #inmueble-container{
-            
-            background: white;
-            margin-bottom:45px;
-            box-shadow: 0px 3px 6px rgba(0,0,0,.15); 
-            border-radius: $border-radius;
-   
-             @include tablet{
-               margin-left: 18px;
-               margin-right: 18px;
-            }
-         }   
-   
-         #asesor-container{
-            
-            
-            background: white;
-            margin-bottom:45px;
-            box-shadow: 0px 3px 6px rgba(0,0,0,.15); 
-            border-radius: $border-radius;
-   
-             @include tablet{
-               margin-left: 18px;
-               margin-right: 18px;
-            }
-         }
+
       }
-        
-      
-     
-   
+
    }
   
 

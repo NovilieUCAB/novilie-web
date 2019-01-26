@@ -9,45 +9,49 @@
          @click="$emit('goPropiedades',true)"
           id="arrow-text"
       > <i class="material-icons">arrow_back</i> Volver</a>
+      
       <section id="main">
          <div id="img-container">
          </div>
          <main>
-            <h2 id="title">Titulo</h2>
+            <h2 id="title">
+               {{inmueble.tipoPropiedad}} en {{inmueble.estadoDireccion}}, {{inmueble.ciudadDireccion}}
+            </h2>
             <div id="price">
-               <span>Venta</span>
-               <h2>BsS 500.000</h2>
+               <span >{{inmueble.operacion}}</span>
+               <h2>BsS {{inmueble.precio}}</h2>
             </div>
             <h2>Descripcion</h2>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet saepe amet aliquam cum earum doloremque, autem incidunt suscipit dignissimos, pariatur ut at dolores commodi vero, corrupti ratione doloribus eum adipisci.</p>
+            <p>{{inmueble.descripcion}}</p>
             <div id="details">
                <h2>Detalles</h2>
                <ul>
-                  <li><strong>Ubicacion: </strong>asdasdasd</li>
-                  <li><strong>Habitaciones: </strong>asdasdas</li>
-                  <li><strong>Baños: </strong>asdasdas</li>
-                  <li><strong>Terreno: </strong>asdasdas</li>
-                  <li><strong>Construccion: </strong>asdasdas</li>
+                  <li><strong>Ubicacion: </strong>{{inmueble.direccion}}</li>
+                  <li><strong>Habitaciones: </strong>{{inmueble.numHabitaciones}}</li>
+                  <li><strong>Baños: </strong>{{inmueble.numBanhos}}</li>
+                  <li><strong>Terreno: </strong>{{inmueble.metrosParcela}} metros</li>
+                  <li><strong>Construccion: </strong>{{inmueble.metrosConstruccion}} metros</li>
                </ul>
             </div>
          </main>
          
          
-      </section>
-   
+     </section>
      <section id="asesor">
          <div id="asesor-img-container">
-            <div id="img"></div>
+            <div id="img">
+               <img :src="asesor.imgUrl" alt="">
+            </div>
          </div>
-         <h1>Latisha Brown</h1>
+         <h1>{{asesor.nombre}} {{asesor.apellido}}</h1>
          <span>Asesor Inmobiliario</span>
          <div>
             <i class="material-icons">email</i>
-            <h3>latishab@gmail.com</h3>
+            <h3>{{asesor.email}}</h3>
          </div>
          <div>
             <i class="material-icons">stay_primary_portrait</i>
-            <h3>+584249304261</h3>
+            <h3>{{asesor.tlf}}</h3>
          </div>
      </section>
 
@@ -59,25 +63,29 @@
          <form action="">
             <div>
                <i class="material-icons">person</i>
-               <input type="text" placeholder="Nombre y apellido">
+               <input v-model="p.nombre"  type="text" placeholder="Nombre y apellido">
             </div>
             <div>
                <i class="material-icons">email</i>
-               <input type="text" placeholder="Correo electronico">
+               <input v-model="p.email"  type="text" placeholder="Correo electronico">
             </div>
             <div>
                <i class="material-icons">stay_primary_portrait</i>
-               <input type="text" placeholder="Telefono">
+               <input v-model="p.telefono"  type="number" placeholder="Telefono">
             </div>
             <div id="textarea">
                <div id="textarea-title"> 
                   <i class="material-icons">sms</i>
                   <span>Preguntar</span>
                </div>
-               <textarea type="text"> </textarea>
+               <textarea v-model="p.pregunta" type="text"> </textarea>
             </div>
 
-            <a>Enviar</a>
+            <a @click="addPregunta">Enviar</a>
+
+            <transition name="fade"> 
+               <h3  :class="{showMsg:showMsg}" id="successMsg">Enviado!</h3>
+            </transition>
          </form>
      </section>
 
@@ -87,15 +95,59 @@
 
 </template>
 <script>
+
+   import firebase from 'firebase'
+
    export default {
       name:'inmueble-info',
       props:{
-         inmueble:Object
+         inmueble:Object,
+         asesor:Object 
       },
       data(){
          return{
-
+            p:{
+               numReferencia:this.inmueble.numReferencia,
+               operacion:this.inmueble.operacion,
+               nombre:'',
+               email:'',
+               telefono:'',
+               pregunta:'',
+               atendito:false,
+            },
+            showMsg:false,
          }
+      },
+      created(){
+
+      },
+      methods:{
+          
+         addPregunta(){
+              if (this.p.nombre.length <= 0 || this.p.email.length <= 0 
+               || this.p.telefono.length <= 0 || this.p.pregunta.length <=0){
+                 return;
+              }
+              const db = firebase.firestore()
+              db.collection('Requerimientos Pendientes').add(this.p)
+              .then(()=>{
+                 this.resetForm()
+                 this.showMsg = true
+                 setTimeout(function(){
+                  this.showMsg = false
+               }.bind(this),2000); 
+              })
+         },
+         onSubmit: function() {
+            this.resetForm(); //clear form automatically after successful request
+         }, 
+         resetForm() {
+            var self = this; //you need this because *this* will refer to Object.keys below`
+            //Iterate through each object field, key is name of the object field`
+            Object.keys(this.p).forEach(function(key) {
+               self.p[key] = '';
+            });
+            },
       }
    }
 </script>
@@ -171,9 +223,15 @@
                width: 150px;
                height: 150px;
                border-radius: 50%;
-               background: pink;
+               
                margin: 0 auto;
                margin-bottom: 12px;
+                img{
+                  width: 100%;
+                  height: 100%;
+                  border-radius: 50%;
+                  border:none;
+               }
             }
          }
          
@@ -268,7 +326,7 @@
                  width: 100%;
                  height: 100px;
                  border:1px solid color(primary); 
-                 font-size: 20px;
+                 font-size: 14px;
               }
               textarea:focus{
                  outline: color(primary);
@@ -294,6 +352,14 @@
                
                display: block;
                width: 50%;
+           }
+           h3#successMsg{
+              text-align: center;
+              color:rgb(76, 150, 1);
+              visibility: hidden;
+           }
+           .showMsg{
+              visibility: visible !important;
            }
         }
      }
@@ -330,6 +396,7 @@
          ;
          grid-gap: 2em;
          a#arrow-text{
+            box-shadow: 0px 4px 6px rgba(0,0,0,.15); 
             cursor: pointer;
             display: flex;
             position: absolute;
