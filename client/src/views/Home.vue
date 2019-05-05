@@ -78,10 +78,7 @@
    import InmuebleInfo from '@/components/InmuebleInfo.vue'
    import AsesorInfo from '@/components/AsesorInfo.vue'
    import SearchBar from '@/components/Searchbar.vue'
-
-
    import firebase from 'firebase'
-import func from './vue-temp/vue-editor-bridge';
 
    export default {
       name: 'home',
